@@ -1,0 +1,1513 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dar-e-Arqam - Education Management Portal</title>
+    <style>
+        /* Core Theme Colors & Reset */
+        :root {
+            --primary-blue: #0f4c81;
+            --secondary-yellow: #ffcc00;
+            --dark-blue: #0a3356;
+            --light-bg: #f4f7f6;
+            --white: #ffffff;
+            --gray-border: #cccccc;
+            --text-dark: #333333;
+            --success-green: #2ecc71;
+            --danger-red: #e74c3c;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--light-bg);
+            color: var(--text-dark);
+        }
+
+        /* Screen-only Layout Utilities */
+        .hidden { display: none !important; }
+        
+        /* Login Page Styling */
+        #login-page {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, var(--primary-blue) 60%, var(--dark-blue));
+            padding: 20px;
+        }
+
+        .login-card {
+            background: var(--white);
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+            width: 100%;
+            max-width: 450px;
+            overflow: hidden;
+            border-top: 8px solid var(--secondary-yellow);
+        }
+
+        .login-header {
+            background-color: var(--primary-blue);
+            color: var(--white);
+            text-align: center;
+            padding: 30px 20px;
+            position: relative;
+        }
+
+        .login-logo-img {
+            height: 90px;
+            width: auto;
+            margin-bottom: 15px;
+            filter: drop-shadow(0px 4px 6px rgba(0,0,0,0.2));
+        }
+
+        .login-header h2 {
+            font-size: 24px;
+            letter-spacing: 1px;
+        }
+
+        .login-header p {
+            color: var(--secondary-yellow);
+            font-size: 14px;
+            margin-top: 5px;
+        }
+
+        .login-body {
+            padding: 40px 30px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--primary-blue);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e1e1e1;
+            border-radius: 6px;
+            font-size: 15px;
+            transition: border-color 0.3s;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary-blue);
+        }
+
+        .btn-login {
+            width: 100%;
+            padding: 12px;
+            background-color: var(--secondary-yellow);
+            color: var(--primary-blue);
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.3s, transform 0.1s;
+        }
+
+        .btn-login:hover {
+            background-color: #e6b800;
+        }
+
+        .btn-login:active {
+            transform: scale(0.98);
+        }
+
+        .error-msg {
+            color: var(--danger-red);
+            background-color: #fde8e8;
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 15px;
+            font-size: 14px;
+            text-align: center;
+            border-left: 4px solid var(--danger-red);
+            display: none;
+        }
+
+        /* App Layout (Dashboard Container) */
+        #app-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar Styling */
+        .sidebar {
+            width: 260px;
+            background-color: var(--primary-blue);
+            color: var(--white);
+            display: flex;
+            flex-direction: column;
+            box-shadow: 3px 0 10px rgba(0,0,0,0.1);
+        }
+
+        .sidebar-brand {
+            padding: 25px 20px;
+            background-color: var(--dark-blue);
+            text-align: center;
+            border-bottom: 4px solid var(--secondary-yellow);
+        }
+
+        .sidebar-menu {
+            list-style: none;
+            padding: 20px 0;
+            flex-grow: 1;
+        }
+
+        .sidebar-item {
+            padding: 15px 25px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            font-weight: 500;
+            transition: all 0.3s;
+            border-left: 4px solid transparent;
+        }
+
+        .sidebar-item:hover, .sidebar-item.active {
+            background-color: var(--dark-blue);
+            border-left-color: var(--secondary-yellow);
+            color: var(--secondary-yellow);
+        }
+
+        .sidebar-footer {
+            padding: 20px;
+            background-color: var(--dark-blue);
+        }
+
+        .btn-logout {
+            width: 100%;
+            padding: 10px;
+            background-color: var(--danger-red);
+            color: var(--white);
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        /* Main Content Workspace */
+        .main-workspace {
+            flex-grow: 1;
+            padding: 30px;
+            overflow-y: auto;
+        }
+
+        .view-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            border-bottom: 3px solid var(--primary-blue);
+            padding-bottom: 10px;
+        }
+
+        .view-header h1 {
+            color: var(--primary-blue);
+        }
+
+        /* Dashboard Counter Cards */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: var(--white);
+            border-radius: 8px;
+            padding: 25px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            border-left: 6px solid var(--primary-blue);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .stat-card.accent {
+            border-left-color: var(--secondary-yellow);
+        }
+
+        .stat-label {
+            font-size: 14px;
+            text-transform: uppercase;
+            color: #777777;
+            font-weight: 600;
+        }
+
+        .stat-value {
+            font-size: 36px;
+            font-weight: bold;
+            color: var(--primary-blue);
+            margin-top: 10px;
+        }
+
+        /* Content Modules Box layout */
+        .content-box {
+            background: var(--white);
+            border-radius: 8px;
+            padding: 25px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            margin-bottom: 30px;
+        }
+
+        .content-box h3 {
+            margin-bottom: 20px;
+            color: var(--primary-blue);
+            border-bottom: 1px solid var(--gray-border);
+            padding-bottom: 10px;
+        }
+
+        /* Buttons Utilities */
+        .btn-action {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background 0.2s;
+        }
+
+        .btn-primary { background-color: var(--primary-blue); color: var(--white); }
+        .btn-primary:hover { background-color: var(--dark-blue); }
+        .btn-warning { background-color: var(--secondary-yellow); color: var(--primary-blue); }
+        .btn-warning:hover { background-color: #e6b800; }
+        .btn-danger { background-color: var(--danger-red); color: var(--white); }
+        .btn-danger:hover { background-color: #c0392b; }
+        .btn-success { background-color: var(--success-green); color: var(--white); }
+        .btn-success:hover { background-color: #27ae60; }
+
+        /* Form Grid Controls */
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        /* Tables layout */
+        .table-responsive {
+            overflow-x: auto;
+            margin-top: 15px;
+        }
+
+        .custom-table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+
+        .custom-table th, .custom-table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #e1e1e1;
+        }
+
+        .custom-table th {
+            background-color: var(--primary-blue);
+            color: var(--white);
+        }
+
+        .custom-table tr:hover {
+            background-color: #f9f9f9;
+        }
+
+        /* Subject Assignment Profiles */
+        .search-container {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .profile-card {
+            border: 2px solid var(--primary-blue);
+            border-radius: 8px;
+            display: flex;
+            padding: 20px;
+            background: #fafafa;
+            margin-bottom: 20px;
+        }
+
+        .profile-avatar {
+            width: 100px;
+            height: 100px;
+            background: #dddddd;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            color: #666666;
+            margin-right: 20px;
+            border: 3px solid var(--secondary-yellow);
+        }
+
+        .profile-info {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            flex-grow: 1;
+        }
+
+        .subject-selection-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .subject-column {
+            background: #fdfdfd;
+            border: 1px solid var(--gray-border);
+            border-radius: 6px;
+            padding: 15px;
+        }
+
+        .subject-column h4 {
+            color: var(--primary-blue);
+            margin-bottom: 10px;
+            border-bottom: 2px solid var(--secondary-yellow);
+            padding-bottom: 5px;
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+            font-size: 15px;
+        }
+
+        .checkbox-group input {
+            margin-right: 10px;
+            width: 18px;
+            height: 18px;
+        }
+
+        .marks-input-table table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .marks-input-table input[type="number"] {
+            width: 80px;
+            padding: 6px;
+            border: 1px solid var(--gray-border);
+            border-radius: 4px;
+        }
+
+        /* ==================== A4 PRINT WINDOW / TEMPLATE STYLING ==================== */
+        #print-preview-pane {
+            background-color: #525659;
+            padding: 40px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .print-actions-bar {
+            width: 21cm;
+            background: var(--white);
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 6px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        }
+
+        /* Exact A4 Portrait Sheet Specifications */
+        .a4-document {
+            width: 21.0cm;
+            height: 29.7cm;
+            background-color: var(--white);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            box-sizing: border-box;
+            padding: 0.28in; 
+            position: relative;
+            color: #000000;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Report Card Decoration Layout */
+        .report-card-border {
+            border: 4px double var(--primary-blue);
+            outline: 2px solid var(--secondary-yellow);
+            padding: 15px;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .report-header {
+            display: flex;
+            align-items: center;
+            border-bottom: 3px solid var(--primary-blue);
+            padding-bottom: 15px;
+            margin-bottom: 15px;
+        }
+
+        .report-logo-img {
+            height: 75px;
+            width: auto;
+            margin-right: 15px;
+            object-fit: contain;
+        }
+
+        .report-title-block {
+            flex-grow: 1;
+            text-align: center;
+        }
+
+        .report-title-block h2 {
+            color: var(--primary-blue);
+            font-size: 24px;
+            text-transform: uppercase;
+            font-weight: 800;
+        }
+
+        .report-title-block p {
+            font-size: 13px;
+            color: #555;
+            font-weight: 600;
+        }
+
+        .report-badge {
+            background-color: var(--secondary-yellow);
+            color: var(--primary-blue);
+            padding: 6px 12px;
+            font-weight: bold;
+            font-size: 14px;
+            border-radius: 4px;
+            border: 1px solid var(--primary-blue);
+        }
+
+        .report-meta-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            font-size: 12px;
+            background-color: #f9f9f9;
+            padding: 10px;
+            border: 1px solid var(--gray-border);
+            border-radius: 4px;
+            margin-bottom: 15px;
+        }
+
+        .meta-item span {
+            font-weight: bold;
+            color: var(--primary-blue);
+        }
+
+        .category-title {
+            background-color: var(--primary-blue);
+            color: var(--secondary-yellow);
+            padding: 6px 10px;
+            font-weight: bold;
+            font-size: 13px;
+            margin-top: 10px;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .report-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12px;
+            margin-bottom: 10px;
+        }
+
+        .report-table th, .report-table td {
+            border: 1px solid #444444;
+            padding: 6px 8px;
+            text-align: center;
+        }
+
+        .report-table th {
+            background-color: #f0f0f0;
+            color: #000;
+        }
+
+        .report-table td.subject-name {
+            text-align: left;
+            font-weight: 600;
+        }
+
+        /* Summary Calculations Layout */
+        .summary-flex-container {
+            display: flex;
+            justify-content: space-between;
+            margin-top: auto;
+            padding-top: 15px;
+            border-top: 2px dashed var(--primary-blue);
+        }
+
+        .metrics-block {
+            width: 55%;
+        }
+
+        .remarks-block {
+            width: 40%;
+            border: 1px solid var(--gray-border);
+            padding: 10px;
+            border-radius: 4px;
+            background-color: #fdfdfd;
+            font-size: 12px;
+        }
+
+        .remarks-block h4 {
+            color: var(--primary-blue);
+            margin-bottom: 5px;
+        }
+
+        .signatures-container {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 40px;
+            font-size: 12px;
+        }
+
+        .sig-line {
+            border-top: 1px solid #000;
+            width: 180px;
+            text-align: center;
+            padding-top: 5px;
+        }
+
+        /* Print Media Overrides */
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            #print-preview-pane, #print-preview-pane * {
+                visibility: visible;
+            }
+            #print-preview-pane {
+                position: absolute;
+                left: 0;
+                top: 0;
+                padding: 0;
+                margin: 0;
+                background: none;
+            }
+            .print-actions-bar {
+                display: none !important;
+            }
+            .a4-document {
+                box-shadow: none;
+                margin: 0;
+                page-break-inside: avoid;
+                page-break-after: always;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- SECTION 1: LOGIN MODULE -->
+    <div id="login-page">
+        <div class="login-card">
+            <div class="login-header">
+                <!-- Swapped to Dar-e-Arqam Image Logo Asset -->
+                <img src="https://crystalpng.com/wp-content/uploads/2025/10/Dar-E-Arqam-logo.png" alt="Dar-e-Arqam Logo" class="login-logo-img">
+                <h2>Dar-e-Arqam Schools</h2>
+                <p>Education Management Portal</p>
+            </div>
+            <div class="login-body">
+                <div id="login-error" class="error-msg">Invalid Username or Password!</div>
+                <div class="form-group">
+                    <label for="login-username">Institutional Email Address</label>
+                    <input type="email" id="login-username" class="form-control" placeholder="username@hifz.com" value="mfaisal786@hifz.com">
+                </div>
+                <div class="form-group">
+                    <label for="login-password">Portal Access Password</label>
+                    <input type="password" id="login-password" class="form-control" placeholder="••••••••" value="faisal786">
+                </div>
+                <button onclick="handleLogin()" class="btn-login">AUTHENTICATE SYSTEM</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MAIN APP SYSTEMS WRAPPER (POST LOGIN) -->
+    <div id="app-container" class="hidden">
+        
+        <!-- SIDEBAR NAVIGATION -->
+        <div class="sidebar">
+            <div class="sidebar-brand">
+                <h2 style="color: var(--secondary-yellow); font-size: 18px;">DAR-E-ARQAM PORTAL</h2>
+                <span style="font-size: 11px; opacity: 0.8;">Admin Operations Hub</span>
+            </div>
+            <ul class="sidebar-menu">
+                <li class="sidebar-item active" onclick="switchView('dashboard-view', this)">System Dashboard</li>
+                <li class="sidebar-item" onclick="switchView('records-view', this)">Student Database</li>
+                <li class="sidebar-item" onclick="switchView('subject-view', this)">Subject Assignment</li>
+                <li class="sidebar-item" onclick="switchView('marks-view', this)">Mark Entry Ledger</li>
+                <li class="sidebar-item" onclick="switchView('generator-view', this)">Result Card Generator</li>
+            </ul>
+            <div class="sidebar-footer">
+                <button onclick="handleLogout()" class="btn-logout">TERMINATE SESSION</button>
+            </div>
+        </div>
+
+        <!-- MAIN WORKSPACE -->
+        <div class="main-workspace" id="main-workspace-view">
+            
+            <!-- DASHBOARD VIEW -->
+            <div id="dashboard-view" class="view-section">
+                <div class="view-header">
+                    <h1>System Dashboard Summary</h1>
+                    <div id="current-date-badge" style="font-weight: 600; color: var(--primary-blue);"></div>
+                </div>
+                
+                <div class="dashboard-grid">
+                    <div class="stat-card">
+                        <span class="stat-label">Total Managed Students</span>
+                        <span class="stat-value" id="dash-total-students">0</span>
+                    </div>
+                    <div class="stat-card accent">
+                        <span class="stat-label">Assigned Curriculum Items</span>
+                        <span class="stat-value">8 Subjects</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-label">System Mode</span>
+                        <span class="stat-value" style="font-size: 24px; color: var(--success-green); padding-top:10px;">A4 Document Ready</span>
+                    </div>
+                </div>
+
+                <div class="content-box">
+                    <h3>Quick System Portal Access Operations</h3>
+                    <p style="margin-bottom: 15px;">Welcome back. Use the navigation choices on the left or the hotkeys below to manipulate system parameters.</p>
+                    <div style="display: flex; gap: 10px;">
+                        <button class="btn-action btn-primary" onclick="document.querySelectorAll('.sidebar-item')[1].click()">Add Student Records</button>
+                        <button class="btn-action btn-warning" onclick="document.querySelectorAll('.sidebar-item')[4].click()">Launch Result Engine</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- STUDENTS DATA RECORD DATABASE -->
+            <div id="records-view" class="view-section hidden">
+                <div class="view-header">
+                    <h1>Students Data Record Database</h1>
+                    <button class="btn-action btn-success" onclick="toggleStudentModal(true)">+ Add New Profile</button>
+                </div>
+
+                <!-- Live Filters -->
+                <div class="content-box" style="padding: 15px; margin-bottom: 20px;">
+                    <div class="form-grid" style="grid-template-columns: 2fr 1fr 1fr; margin-bottom: 0;">
+                        <input type="text" id="search-student-db" class="form-control" placeholder="Search by Full Name, Roll Number, or Admission ID..." oninput="renderStudentTable()">
+                        <select id="filter-class-db" class="form-control" onchange="renderStudentTable()">
+                            <option value="">All Classes</option>
+                        </select>
+                        <select id="filter-sec-db" class="form-control" onchange="renderStudentTable()">
+                            <option value="">All Sections</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Registration Form Box -->
+                <div id="student-modal-box" class="content-box hidden">
+                    <h3 id="modal-form-title">Register New Student Profile</h3>
+                    <form id="student-record-form" onsubmit="saveStudent(event)">
+                        <input type="hidden" id="form-edit-index" value="">
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label>Full Name *</label>
+                                <input type="text" id="s-name" class="form-control" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Father Name *</label>
+                                <input type="text" id="s-father" class="form-control" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Admission ID *</label>
+                                <input type="text" id="s-admission" class="form-control" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Roll Number *</label>
+                                <input type="text" id="s-roll" class="form-control" required>
+                            </div>
+                        </div>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label>Class (Type Your Own) *</label>
+                                <input type="text" id="s-class" class="form-control" placeholder="e.g., Grade 5, Year 2, Hifz-A" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Section (Type Your Own) *</label>
+                                <input type="text" id="s-section" class="form-control" placeholder="e.g., A, Blue, Rose" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Date of Birth</label>
+                                <input type="date" id="s-dob" class="form-control">
+                            </div>
+                            <div class="form-group">
+                                <label>Gender</label>
+                                <select id="s-gender" class="form-control">
+                                    <option value="Male">Male</option>
+                                    <option value="Female">Female</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-grid">
+                            <div class="form-group" style="grid-column: span 2;">
+                                <label>Contact Number / Address</label>
+                                <input type="text" id="s-contact" class="form-control" placeholder="Phone and Resident details">
+                            </div>
+                            <div class="form-group" style="grid-column: span 2;">
+                                <label>Teacher Remarks / Standing</label>
+                                <input type="text" id="s-remarks" class="form-control" placeholder="Excellent behavior, regular etc.">
+                            </div>
+                        </div>
+                        <div style="display: flex; gap: 10px; justify-content: flex-end;">
+                            <button type="button" class="btn-action" onclick="toggleStudentModal(false)">Cancel</button>
+                            <button type="submit" class="btn-action btn-primary">Commit To Database</button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Database Table Matrix -->
+                <div class="content-box">
+                    <h3>Registered Students System Ledger</h3>
+                    <div class="table-responsive">
+                        <table class="custom-table" id="student-database-table">
+                            <thead>
+                                <tr>
+                                    <th>Admission ID</th>
+                                    <th>Roll No</th>
+                                    <th>Name</th>
+                                    <th>Father Name</th>
+                                    <th>Class & Sec</th>
+                                    <th>Gender</th>
+                                    <th>Actions Matrix</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SUBJECT ASSIGNING -->
+            <div id="subject-view" class="view-section hidden">
+                <div class="view-header">
+                    <h1>Subject Assignment Controller Panel</h1>
+                </div>
+
+                <div class="content-box">
+                    <h3>Step 1: Locate Target Student Profile</h3>
+                    <div class="search-container">
+                        <input type="text" id="subject-search-input" class="form-control" placeholder="Enter Admission ID, Roll No or Name..." oninput="searchStudentForSubjects()">
+                    </div>
+
+                    <div id="subject-profile-card" class="profile-card hidden">
+                        <div class="profile-avatar">👤</div>
+                        <div class="profile-info">
+                            <div><strong>Full Student Name:</strong> <span id="sbj-card-name">-</span></div>
+                            <div><strong>Father Name:</strong> <span id="sbj-card-father">-</span></div>
+                            <div><strong>Admission Identifier:</strong> <span id="sbj-card-id">-</span></div>
+                            <div><strong>Assigned Placement:</strong> <span id="sbj-card-class">-</span></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="content-box disabled-zone" id="subject-matrix-box">
+                    <h3>Step 2: Assign Coursework Structure Matrices</h3>
+                    <div class="subject-selection-grid">
+                        <div class="subject-column">
+                            <h4>Compulsory Coursework (Hifz Category)</h4>
+                            <div class="checkbox-group"><input type="checkbox" id="sbj-tajweed" checked disabled> <label>Tajweed (Compulsory)</label></div>
+                            <div class="checkbox-group"><input type="checkbox" id="sbj-memory" checked disabled> <label>Memory (Compulsory)</label></div>
+                            <div class="checkbox-group"><input type="checkbox" id="sbj-morality" checked disabled> <label>Morality (Compulsory)</label></div>
+                            <div class="checkbox-group"><input type="checkbox" id="sbj-target" checked disabled> <label>Target (Compulsory)</label></div>
+                        </div>
+                        <div class="subject-column">
+                            <h4>Optional Coursework (Hifz Education Category)</h4>
+                            <div class="checkbox-group"><input type="checkbox" id="sbj-english"> <label>English Language</label></div>
+                            <div class="checkbox-group"><input type="checkbox" id="sbj-urdu"> <label>Urdu Language</label></div>
+                            <div class="checkbox-group"><input type="checkbox" id="sbj-maths"> <label>Mathematics Structures</label></div>
+                            <div class="checkbox-group"><input type="checkbox" id="sbj-science"> <label>General Science</label></div>
+                        </div>
+                    </div>
+                    <div style="margin-top: 20px; text-align: right;">
+                        <button class="btn-action btn-primary" onclick="saveSubjectAssignment()">Update Assigned Subjects Matrix</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- MARKS ENTRY SYSTEM -->
+            <div id="marks-view" class="view-section hidden">
+                <div class="view-header">
+                    <h1>Subject-wise Mark Ledger Entry</h1>
+                </div>
+                <div class="content-box">
+                    <h3>Select Student to Record Marks</h3>
+                    <select id="marks-student-selector" class="form-control" onchange="loadStudentMarkSheet()">
+                    </select>
+                </div>
+
+                <div class="content-box hidden" id="marks-sheet-container">
+                    <h3 id="marks-sheet-title">Academic Record Sheet</h3>
+                    <div class="marks-input-table">
+                        <table>
+                            <thead>
+                                <tr style="background-color: var(--primary-blue); color: white; text-align: left;">
+                                    <th style="padding: 10px;">Subject Categories</th>
+                                    <th style="padding: 10px;">Total Allocated Marks</th>
+                                    <th style="padding: 10px;">Obtained Marks Parameters</th>
+                                </tr>
+                            </thead>
+                            <tbody id="marks-entry-tbody">
+                            </tbody>
+                        </table>
+                        <div style="margin-top: 20px; text-align: right;">
+                            <button class="btn-action btn-success" onclick="saveObtainedMarks()">Save Ledger Balances</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- RESULT CARD GENERATOR -->
+            <div id="generator-view" class="view-section hidden">
+                <div class="view-header">
+                    <h1>System Result Card Generator Engine</h1>
+                </div>
+                <div class="content-box">
+                    <h3>Select Target Profile for Printing Execution</h3>
+                    <div class="form-grid" style="grid-template-columns: 3fr 1fr;">
+                        <select id="generator-student-selector" class="form-control">
+                        </select>
+                        <button class="btn-action btn-warning" onclick="generateAndPreviewResult()">Compile Result Form</button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- ==================== HIGH PRECISION A4 PRINT OUTPUT PANE ==================== -->
+    <div id="print-preview-pane" class="hidden">
+        <div class="print-actions-bar">
+            <div>
+                <strong style="color: var(--primary-blue);">Print Preview Window Mode (Exact A4 Dimensions Framework)</strong>
+                <p style="font-size: 11px; margin-top: 2px; color: #666;">Set printer layout orientation config to <strong>Portrait</strong>, Margins to <strong>None</strong></p>
+            </div>
+            <div style="display: flex; gap: 10px;">
+                <button class="btn-action" onclick="closePrintPreview()">← Back to Management Portal</button>
+                <button class="btn-action btn-warning" onclick="exportToExcelPlaceholder()">Export Data File (.xls)</button>
+                <button class="btn-action btn-primary" onclick="window.print()">Execute Hardware Print Command</button>
+            </div>
+        </div>
+
+        <!-- Render Target Core Template Framework -->
+        <div class="a4-document" id="a4-document-printout">
+            <div class="report-card-border">
+                
+                <!-- Brand Header containing your exact school logo asset link -->
+                <div class="report-header">
+                    <img src="https://crystalpng.com/wp-content/uploads/2025/10/Dar-E-Arqam-logo.png" alt="Dar-e-Arqam Logo" class="report-logo-img">
+                    <div class="report-title-block">
+                        <h2>Dar-e-Arqam Schools</h2>
+                        <p>Affiliated Premium Education Management Network Systems</p>
+                        <p style="font-size:11px; font-weight:bold; color:var(--primary-blue); margin-top:3px;">OFFICIAL SYSTEM TRANSCRIPT OF ACADEMIC ACHIEVEMENT</p>
+                    </div>
+                    <div class="report-badge" id="rc-class-badge">CLASS</div>
+                </div>
+
+                <!-- Meta Metadata Information Ledger Grid -->
+                <div class="report-meta-grid">
+                    <div class="meta-item"><span>Student Name:</span> <slot id="rc-name"></slot></div>
+                    <div class="meta-item"><span>Admission Identifier:</span> <slot id="rc-admission"></slot></div>
+                    <div class="meta-item"><span>Roll Matrix Number:</span> <slot id="rc-roll"></slot></div>
+                    <div class="meta-item"><span>Father Name:</span> <slot id="rc-father"></slot></div>
+                    <div class="meta-item"><span>Class Program Structure:</span> <slot id="rc-class"></slot></div>
+                    <div class="meta-item"><span>Section Unit:</span> <slot id="rc-section"></slot></div>
+                    <div class="meta-item"><span>Date of Birth Record:</span> <slot id="rc-dob"></slot></div>
+                    <div class="meta-item"><span>Gender Type:</span> <slot id="rc-gender"></slot></div>
+                    <div class="meta-item"><span>Date Issued:</span> <slot id="rc-date"></slot></div>
+                </div>
+
+                <!-- CATEGORY BLOCK A: COMPULSORY INFRASTRUCTURE -->
+                <div class="category-title">Academic Category: Hifz Coursework (Compulsory)</div>
+                <table class="report-table">
+                    <thead>
+                        <tr>
+                            <th style="text-align: left; width: 40%;">Subject Configuration Title</th>
+                            <th style="width: 20%;">Total Marks</th>
+                            <th style="width: 20%;">Obtained Marks</th>
+                            <th style="width: 20%;">Status Vector</th>
+                        </tr>
+                    </thead>
+                    <tbody id="rc-tbody-hifz">
+                    </tbody>
+                </table>
+
+                <!-- CATEGORY BLOCK B: OPTIONAL INFRASTRUCTURE -->
+                <div class="category-title">Academic Category: Hifz Education Coursework (Optional)</div>
+                <table class="report-table">
+                    <thead>
+                        <tr>
+                            <th style="text-align: left; width: 40%;">Subject Configuration Title</th>
+                            <th style="width: 20%;">Total Marks</th>
+                            <th style="width: 20%;">Obtained Marks</th>
+                            <th style="width: 20%;">Status Vector</th>
+                        </tr>
+                    </thead>
+                    <tbody id="rc-tbody-education">
+                    </tbody>
+                </table>
+
+                <!-- Summary System Framework Footer Row -->
+                <div class="summary-flex-container">
+                    <div class="metrics-block">
+                        <table class="report-table" style="margin-bottom: 0;">
+                            <tr>
+                                <th style="text-align: left; background:#f9f9f9;">Cumulative Total Scaled Marks:</th>
+                                <td id="rc-total-marks" style="font-weight: bold;">0 / 0</td>
+                            </tr>
+                            <tr>
+                                <th style="text-align: left; background:#f9f9f9;">Percentage Yield Parameter:</th>
+                                <td id="rc-percentage" style="font-weight: bold;">0.00%</td>
+                            </tr>
+                            <tr>
+                                <th style="text-align: left; background:#f9f9f9;">Assigned Performance Alpha Grade:</th>
+                                <td id="rc-grade" style="font-weight: bold; color: var(--primary-blue);">F</td>
+                            </tr>
+                            <tr>
+                                <th style="text-align: left; background:#f9f9f9;">System Outcome Verdict:</th>
+                                <td id="rc-status" style="font-weight: bold;">FAIL</td>
+                            </tr>
+                        </table>
+                    </div>
+                    
+                    <div class="remarks-block">
+                        <h4>Institutional Remarks</h4>
+                        <p id="rc-remarks">No computational error logged inside operational runtime parameters.</p>
+                    </div>
+                </div>
+
+                <!-- Signature Authority Infrastructure -->
+                <div class="signatures-container">
+                    <div class="sig-line">Class Instructor Signature</div>
+                    <div class="sig-line">Controller of Examinations</div>
+                    <div class="sig-line">Principal / Director Stamp</div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== EMBEDDED SYSTEM JAVASCRIPT ENGINE ==================== -->
+    <script>
+        // Core Volatile In-Memory Database State
+        let studentDatabase = [
+            {
+                name: "Muhammad Ali Faisal",
+                father: "Faisal Shahzad",
+                admission: "DA-2026-001",
+                roll: "1001",
+                class: "Grade-1",
+                section: "Makkah",
+                dob: "2015-06-12",
+                gender: "Male",
+                contact: "+92 300 1234567",
+                remarks: "Highly disciplined student with great Tajweed aptitude.",
+                subjects: {
+                    tajweed: { assigned: true, total: 100, obtained: 92 },
+                    memory: { assigned: true, total: 100, obtained: 88 },
+                    morality: { assigned: true, total: 50, obtained: 46 },
+                    target: { assigned: true, total: 50, obtained: 42 },
+                    english: { assigned: true, total: 75, obtained: 61 },
+                    urdu: { assigned: true, total: 75, obtained: 65 },
+                    maths: { assigned: false, total: 75, obtained: 0 },
+                    science: { assigned: false, total: 75, obtained: 0 }
+                }
+            },
+            {
+                name: "Ayesha Bibi",
+                father: "Abdul Rehman",
+                admission: "DA-2026-002",
+                roll: "1002",
+                class: "Grade-2",
+                section: "Madinah",
+                dob: "2014-03-22",
+                gender: "Female",
+                contact: "+92 321 7654321",
+                remarks: "Shows incredible focus during memorization modules.",
+                subjects: {
+                    tajweed: { assigned: true, total: 100, obtained: 95 },
+                    memory: { assigned: true, total: 100, obtained: 97 },
+                    morality: { assigned: true, total: 50, obtained: 48 },
+                    target: { assigned: true, total: 50, guided: 50 },
+                    english: { assigned: true, total: 100, obtained: 82 },
+                    urdu: { assigned: true, total: 100, obtained: 89 },
+                    maths: { assigned: true, total: 100, obtained: 91 },
+                    science: { assigned: true, total: 100, obtained: 85 }
+                }
+            }
+        ];
+
+        // Subject meta dictionary detailing system configurations
+        const subjectMeta = {
+            tajweed: { name: "Tajweed & Phonetics", category: "hifz" },
+            memory: { name: "Quran Memorization (Sabak)", category: "hifz" },
+            morality: { name: "Islamic Morality & Manners", category: "hifz" },
+            target: { name: "Daily Target Revision (Sabki)", category: "hifz" },
+            english: { name: "English Language Arts", category: "education" },
+            urdu: { name: "Urdu Literature & Writing", category: "education" },
+            maths: { name: "Mathematical Foundations", category: "education" },
+            science: { name: "General Scientific Inquiries", category: "education" }
+        };
+
+        // System Initialization Hook
+        window.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('current-date-badge').innerText = "System Date: " + new Date().toLocaleDateString();
+            updateDashboardMetrics();
+            updateDatabaseFilterDropdowns();
+            renderStudentTable();
+        });
+
+        // Authentication Logic
+        function handleLogin() {
+            const uInput = document.getElementById('login-username').value;
+            const pInput = document.getElementById('login-password').value;
+            const errBox = document.getElementById('login-error');
+
+            if (uInput === "mfaisal786@hifz.com" && pInput === "faisal786") {
+                errBox.style.display = 'none';
+                document.getElementById('login-page').style.display = 'none';
+                document.getElementById('app-container').classList.remove('hidden');
+                updateDashboardMetrics();
+                updateDatabaseFilterDropdowns();
+                renderStudentTable();
+                populateSelectors();
+            } else {
+                errBox.style.display = 'block';
+            }
+        }
+
+        function handleLogout() {
+            document.getElementById('app-container').classList.add('hidden');
+            document.getElementById('login-page').style.display = 'flex';
+        }
+
+        // View Router Switching Engine
+        function switchView(viewId, element) {
+            document.querySelectorAll('.view-section').forEach(section => section.classList.add('hidden'));
+            document.querySelectorAll('.sidebar-item').forEach(item => item.classList.remove('active'));
+            
+            document.getElementById(viewId).classList.remove('hidden');
+            element.classList.add('active');
+
+            if(viewId === 'dashboard-view') updateDashboardMetrics();
+            if(viewId === 'records-view') {
+                updateDatabaseFilterDropdowns();
+                renderStudentTable();
+            }
+            if(viewId === 'marks-view' || viewId === 'generator-view') populateSelectors();
+        }
+
+        function updateDashboardMetrics() {
+            document.getElementById('dash-total-students').innerText = studentDatabase.length;
+        }
+
+        // Dynamic filters setup to handle fully custom entries
+        function updateDatabaseFilterDropdowns() {
+            const classFilter = document.getElementById('filter-class-db');
+            const secFilter = document.getElementById('filter-sec-db');
+            
+            const currentClassSelection = classFilter.value;
+            const currentSecSelection = secFilter.value;
+
+            const classes = new Set();
+            const sections = new Set();
+            studentDatabase.forEach(st => {
+                if(st.class) classes.add(st.class.trim());
+                if(st.section) sections.add(st.section.trim());
+            });
+
+            let classOptions = '<option value="">All Classes</option>';
+            classes.forEach(c => {
+                classOptions += `<option value="${c}">${c}</option>`;
+            });
+            classFilter.innerHTML = classOptions;
+            classFilter.value = classes.has(currentClassSelection) ? currentClassSelection : "";
+
+            let secOptions = '<option value="">All Sections</option>';
+            sections.forEach(s => {
+                secOptions += `<option value="${s}">${s}</option>`;
+            });
+            secFilter.innerHTML = secOptions;
+            secFilter.value = sections.has(currentSecSelection) ? currentSecSelection : "";
+        }
+
+        function populateSelectors() {
+            const marksSel = document.getElementById('marks-student-selector');
+            const genSel = document.getElementById('generator-student-selector');
+            
+            let optionsStr = '<option value="">-- Choose/Select a Valid Database Record Target --</option>';
+            studentDatabase.forEach((st, idx) => {
+                optionsStr += `<option value="${idx}">ID: ${st.admission} | Roll: ${st.roll} - ${st.name} [${st.class}-${st.section}]</option>`;
+            });
+            
+            marksSel.innerHTML = optionsStr;
+            genSel.innerHTML = optionsStr;
+        }
+
+        // Student Database Operations Execution
+        function toggleStudentModal(show) {
+            const box = document.getElementById('student-modal-box');
+            if(show) {
+                box.classList.remove('hidden');
+                document.getElementById('student-record-form').reset();
+                document.getElementById('form-edit-index').value = "";
+                document.getElementById('modal-form-title').innerText = "Register New Student Profile";
+            } else {
+                box.classList.add('hidden');
+            }
+        }
+
+        function saveStudent(e) {
+            e.preventDefault();
+            const editIdx = document.getElementById('form-edit-index').value;
+
+            const studentObj = {
+                name: document.getElementById('s-name').value.trim(),
+                father: document.getElementById('s-father').value.trim(),
+                admission: document.getElementById('s-admission').value.trim(),
+                roll: document.getElementById('s-roll').value.trim(),
+                class: document.getElementById('s-class').value.trim(), 
+                section: document.getElementById('s-section').value.trim(), 
+                dob: document.getElementById('s-dob').value,
+                gender: document.getElementById('s-gender').value,
+                contact: document.getElementById('s-contact').value,
+                remarks: document.getElementById('s-remarks').value,
+                subjects: editIdx !== "" ? studentDatabase[editIdx].subjects : {
+                    tajweed: { assigned: true, total: 100, obtained: 0 },
+                    memory: { assigned: true, total: 100, obtained: 0 },
+                    morality: { assigned: true, total: 50, obtained: 0 },
+                    target: { assigned: true, total: 50, obtained: 0 },
+                    english: { assigned: false, total: 75, obtained: 0 },
+                    urdu: { assigned: false, total: 75, obtained: 0 },
+                    maths: { assigned: false, total: 75, obtained: 0 },
+                    science: { assigned: false, total: 75, obtained: 0 }
+                }
+            };
+
+            const duplicate = studentDatabase.find((st, i) => 
+                (st.admission === studentObj.admission || st.roll === studentObj.roll) && i != editIdx
+            );
+
+            if(duplicate) {
+                alert("Conflict Identified: Admission ID or Roll Number already exists.");
+                return;
+            }
+
+            if(editIdx === "") {
+                studentDatabase.push(studentObj);
+            } else {
+                studentDatabase[editIdx] = studentObj;
+            }
+
+            toggleStudentModal(false);
+            updateDatabaseFilterDropdowns();
+            renderStudentTable();
+            updateDashboardMetrics();
+        }
+
+        function renderStudentTable() {
+            const tbody = document.querySelector('#student-database-table tbody');
+            const searchVal = document.getElementById('search-student-db').value.toLowerCase();
+            const classVal = document.getElementById('filter-class-db').value;
+            const secVal = document.getElementById('filter-sec-db').value;
+
+            tbody.innerHTML = "";
+
+            studentDatabase.forEach((student, index) => {
+                const matchesSearch = student.name.toLowerCase().includes(searchVal) || 
+                                      student.roll.includes(searchVal) || 
+                                      student.admission.toLowerCase().includes(searchVal);
+                const matchesClass = classVal === "" || student.class === classVal;
+                const matchesSec = secVal === "" || student.section === secVal;
+
+                if(matchesSearch && matchesClass && matchesSec) {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td><strong>${student.admission}</strong></td>
+                        <td>${student.roll}</td>
+                        <td>${student.name}</td>
+                        <td>${student.father}</td>
+                        <td>${student.class} (${student.section})</td>
+                        <td>${student.gender}</td>
+                        <td>
+                            <button class="btn-action btn-warning" style="padding:4px 8px; font-size:12px;" onclick="editStudent(${index})">Edit</button>
+                            <button class="btn-action btn-danger" style="padding:4px 8px; font-size:12px;" onclick="deleteStudent(${index})">Delete</button>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                }
+            });
+        }
+
+        function editStudent(index) {
+            const st = studentDatabase[index];
+            toggleStudentModal(true);
+            document.getElementById('modal-form-title').innerText = "Modify Operational Record Profile";
+            document.getElementById('form-edit-index').value = index;
+            
+            document.getElementById('s-name').value = st.name;
+            document.getElementById('s-father').value = st.father;
+            document.getElementById('s-admission').value = st.admission;
+            document.getElementById('s-roll').value = st.roll;
+            document.getElementById('s-class').value = st.class; 
+            document.getElementById('s-section').value = st.section; 
+            document.getElementById('s-dob').value = st.dob;
+            document.getElementById('s-gender').value = st.gender;
+            document.getElementById('s-contact').value = st.contact;
+            document.getElementById('s-remarks').value = st.remarks;
+        }
+
+        function deleteStudent(index) {
+            if(confirm("Confirm destructive execution: Permanently purge student profile data?")) {
+                studentDatabase.splice(index, 1);
+                updateDatabaseFilterDropdowns();
+                renderStudentTable();
+                updateDashboardMetrics();
+            }
+        }
+
+        // Subject Assignment Logic
+        let transientSubjectTargetIndex = null;
+
+        function searchStudentForSubjects() {
+            const needle = document.getElementById('subject-search-input').value.toLowerCase().trim();
+            const targetCard = document.getElementById('subject-profile-card');
+            const matrixBox = document.getElementById('subject-matrix-box');
+            
+            if(needle === "") {
+                targetCard.classList.add('hidden');
+                matrixBox.classList.add('disabled-zone');
+                return;
+            }
+
+            const foundIdx = studentDatabase.findIndex(st => 
+                st.admission.toLowerCase() === needle || 
+                st.roll === needle || 
+                st.name.toLowerCase().includes(needle)
+            );
+
+            if(foundIdx !== -1) {
+                transientSubjectTargetIndex = foundIdx;
+                const match = studentDatabase[foundIdx];
+                
+                document.getElementById('sbj-card-name').innerText = match.name;
+                document.getElementById('sbj-card-father').innerText = match.father;
+                document.getElementById('sbj-card-id').innerText = match.admission;
+                document.getElementById('sbj-card-class').innerText = `${match.class} - Sec: ${match.section}`;
+                
+                document.getElementById('sbj-english').checked = match.subjects.english.assigned;
+                document.getElementById('sbj-urdu').checked = match.subjects.urdu.assigned;
+                document.getElementById('sbj-maths').checked = match.subjects.maths.assigned;
+                document.getElementById('sbj-science').checked = match.subjects.science.assigned;
+
+                targetCard.classList.remove('hidden');
+                matrixBox.classList.remove('disabled-zone');
+            } else {
+                targetCard.classList.add('hidden');
+                matrixBox.classList.add('disabled-zone');
+                transientSubjectTargetIndex = null;
+            }
+        }
+
+        function saveSubjectAssignment() {
+            if(transientSubjectTargetIndex === null) return;
+            
+            const targetSt = studentDatabase[transientSubjectTargetIndex];
+            
+            targetSt.subjects.english.assigned = document.getElementById('sbj-english').checked;
+            targetSt.subjects.urdu.assigned = document.getElementById('sbj-urdu').checked;
+            targetSt.subjects.maths.assigned = document.getElementById('sbj-maths').checked;
+            targetSt.subjects.science.assigned = document.getElementById('sbj-science').checked;
+
+            alert(`Subject structures updated successfully for ${targetSt.name}.`);
+        }
+
+        // Marks Ledger Entry Logic
+        function loadStudentMarkSheet() {
+            const idx = document.getElementById('marks-student-selector').value;
+            const container = document.getElementById('marks-sheet-container');
+            const tbody = document.getElementById('marks-entry-tbody');
+            
+            if(idx === "") {
+                container.classList.add('hidden');
+                return;
+            }
+
+            const targetStudent = studentDatabase[idx];
+            document.getElementById('marks-sheet-title').innerText = `Record Ledger Metrics: ${targetStudent.name}`;
+            tbody.innerHTML = "";
+
+            for (const [key, value] of Object.entries(targetStudent.subjects)) {
+                if(value.assigned) {
+                    const meta = subjectMeta[key];
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td style="padding:10px;">
+                            <strong>${meta.name}</strong><br>
+                            <small style="color:#777; text-transform:uppercase;">Category: ${meta.category === 'hifz' ? 'Hifz (Compulsory)' : 'Hifz Education (Optional)'}</small>
+                        </td>
+                        <td style="padding:10px;">
+                            <input type="number" id="total-val-${key}" class="form-control" style="width:100px;" value="${value.total}" min="1">
+                        </td>
+                        <td style="padding:10px;">
+                            <input type="number" id="obt-val-${key}" class="form-control" style="width:100px;" value="${value.obtained}" min="0" max="${value.total}">
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                }
+            }
+            container.classList.remove('hidden');
+        }
+
+        function saveObtainedMarks() {
+            const idx = document.getElementById('marks-student-selector').value;
+            if(idx === "") return;
+
+            const targetStudent = studentDatabase[idx];
+
+            for (const key of Object.keys(targetStudent.subjects)) {
+                const totalEl = document.getElementById(`total-val-${key}`);
+                const obtEl = document.getElementById(`obt-val-${key}`);
+
+                if(totalEl && obtEl) {
+                    const parsedTotal = parseInt(totalEl.value) || 0;
+                    const parsedObt = parseInt(obtEl.value) || 0;
+
+                    if(parsedObt > parsedTotal) {
+                        alert(`Validation Error: Obtained marks in ${subjectMeta[key].name} cannot exceed total bounds!`);
+                        return;
+                    }
+
+                    targetStudent.subjects[key].total = parsedTotal;
+                    targetStudent.subjects[key].obtained = parsedObt;
+                }
+            }
+
+            alert("Ledger Mark entries saved securely.");
+        }
+
+        // Result Card Generation & Matrix Compiler
+        function generateAndPreviewResult() {
+            const idx = document.getElementById('generator-student-selector').value;
+            if(idx === "") {
+                alert("Please select a target profile from the menu listing.");
+                return;
+            }
+
+            const student = studentDatabase[idx];
+            
+            document.getElementById('rc-name').innerText = student.name;
+            document.getElementById('rc-father').innerText = student.father;
+            document.getElementById('rc-admission').innerText = student.admission;
+            document.getElementById('rc-roll').innerText = student.roll;
+            document.getElementById('rc-class').innerText = student.class;
+            document.getElementById('rc-section').innerText = student.section;
+            document.getElementById('rc-dob').innerText = student.dob ? student.dob : "N/A";
+            document.getElementById('rc-gender').innerText = student.gender;
+            document.getElementById('rc-date').innerText = new Date().toLocaleDateString();
+            document.getElementById('rc-class-badge').innerText = `${student.class.toUpperCase()} (${student.section.toUpperCase()})`;
+            document.getElementById('rc-remarks').innerText = student.remarks ? student.remarks : "Student performance tracking complete.";
+
+            let cumTotal = 0;
+            let cumObtained = 0;
+            let failSwitch = false;
+
+            const hifzTbody = document.getElementById('rc-tbody-hifz');
+            const eduTbody = document.getElementById('rc-tbody-education');
+            
+            hifzTbody.innerHTML = "";
+            eduTbody.innerHTML = "";
+
+            for (const [key, sub] of Object.entries(student.subjects)) {
+                if(!sub.assigned) continue;
+
+                const meta = subjectMeta[key];
+                const pct = (sub.obtained / sub.total) * 100;
+                const status = pct >= 40 ? "PASS" : "FAIL";
+                if(status === "FAIL") failSwitch = true;
+
+                cumTotal += sub.total;
+                cumObtained += sub.obtained;
+
+                const rowHtml = `
+                    <tr>
+                        <td class="subject-name">${meta.name}</td>
+                        <td>${sub.total}</td>
+                        <td style="font-weight:bold;">${sub.obtained}</td>
+                        <td style="font-weight:bold; color: ${status === 'PASS' ? 'green' : 'red'}">${status}</td>
+                    </tr>
+                `;
+
+                if(meta.category === 'hifz') {
+                    hifzTbody.innerHTML += rowHtml;
+                } else {
+                    eduTbody.innerHTML += rowHtml;
+                }
+            }
+
+            const totalPercentage = cumTotal > 0 ? (cumObtained / cumTotal) * 100 : 0;
+            
+            let alphaGrade = "F";
+            if(totalPercentage >= 90) alphaGrade = "A+";
+            else if(totalPercentage >= 80) alphaGrade = "A";
+            else if(totalPercentage >= 70) alphaGrade = "B";
+            else if(totalPercentage >= 60) alphaGrade = "C";
+            else if(totalPercentage >= 50) alphaGrade = "D";
+            else if(totalPercentage >= 40) alphaGrade = "E";
+
+            document.getElementById('rc-total-marks').innerText = `${cumObtained} / ${cumTotal}`;
+            document.getElementById('rc-percentage').innerText = `${totalPercentage.toFixed(2)}%`;
+            document.getElementById('rc-grade').innerText = alphaGrade;
+            
+            const overallStatusEl = document.getElementById('rc-status');
+            if(failSwitch || totalPercentage < 40) {
+                overallStatusEl.innerText = "FAIL";
+                overallStatusEl.style.color = "red";
+            } else {
+                overallStatusEl.innerText = "PROMOTED / PASSED";
+                overallStatusEl.style.color = "green";
+            }
+
+            document.getElementById('app-container').classList.add('hidden');
+            document.getElementById('print-preview-pane').classList.remove('hidden');
+        }
+
+        function closePrintPreview() {
+            document.getElementById('print-preview-pane').classList.add('hidden');
+            document.getElementById('app-container').classList.remove('hidden');
+        }
+
+        function exportToExcelPlaceholder() {
+            alert("Export System Action Triggered: Excel file generation process initiated.");
+        }
+    </script>
+</body>
+</html>
